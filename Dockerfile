@@ -1,11 +1,17 @@
-FROM	ubuntu:14.04
-RUN 	apt-get update && apt-get install -y curl && apt-get clean && rm -rf /var/lib/apt/lists
-RUN		curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
-RUN		apt-get update && apt-get install -y nodejs 
+FROM node:16
 
-COPY	package.json /src/package.json
-RUN		cd /src; npm install --production
-COPY	. /src
+ENV HOME=/home/app
 
-EXPOSE  3000
-CMD		["node", "/src/server.js"]
+RUN apt-get update && apt-get install htop
+
+COPY package.json package-lock.json $HOME/node_docker/
+
+WORKDIR $HOME/node_docker
+
+RUN npm install --silent --progress=false
+
+COPY . $HOME/node_docker
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
